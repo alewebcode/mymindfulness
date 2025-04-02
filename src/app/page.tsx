@@ -1,0 +1,123 @@
+'use client'
+import { BellOff, BellRing, Pause, Play, RotateCcw } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import NotificationSound from '../../public/notifications/notification-sound.mp3'
+
+
+export default function Home() {
+  const [progress, setProgress] = useState(0)
+  const [count, setCount] = useState(1)
+  const [time, setTime] = useState(0)
+  const [initialTime, setinitialTime] = useState(0)
+  const [startTime, setStartTime] = useState(false)
+  const [alarm, setAlarm] = useState(true)
+  const audioPlayer = useRef<HTMLAudioElement>(null)
+ 
+ 
+
+  useEffect(() => {
+
+    if(progress === 942 && alarm && time === 0){
+    
+      if( audioPlayer.current)
+        audioPlayer.current.play()
+    }
+
+    if(time > 0 && startTime){
+    const num = 942 / initialTime //number of the progress bar
+    
+    if (progress <= 942) {
+   
+
+      let IdInterval = setInterval(() => {
+        
+        setCount(count => count + 1);
+        setTime((time) => time - 1000)
+
+
+      }, 1000)
+
+      setProgress(num * count) //Increase the progress of value using the count
+
+      return (() => {
+
+        clearInterval(IdInterval)
+
+
+      })
+
+    }
+
+
+    }
+
+  }, [count,time,startTime,progress])
+
+
+  const formatTime = ((t: number) => {
+    let formatSecond = t / 1000
+
+    let diff = formatSecond - (((Date.now() - Date.now()) / 1000) | 0);
+
+    let min = Math.floor(formatSecond / 60)
+    let seconds = (diff % 60) | 0;
+
+    let formatMinutes = min < 10?'0'+ min:min
+    let formatSeconds = seconds < 10?'0'+ seconds:seconds
+
+    return `${formatMinutes}:${formatSeconds}`
+  })
+
+  const handleSetTime = ((t: number) => {
+    setCount(1)
+    setTime(t * 1000)
+    setinitialTime(t)
+    setProgress(0)
+    setStartTime(false)
+
+    
+  })
+
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-between p-24 w-100">
+      <div className="flex justify-center flex-col items-center">
+
+        <svg className="h-96 w-96" >
+          <g transform="rotate(-90 100 100)" >
+            <circle r="150" strokeLinecap="round" cx="10" cy="192" fill="#292929" stroke="#3A3737" strokeWidth="10" strokeDasharray="942" strokeDashoffset="0"></circle>
+            <circle r="150" strokeLinecap="round" cx="10" cy="192" fill="transparent" stroke="#46EE6A" strokeWidth="10" strokeDasharray="942" strokeDashoffset={progress}></circle>
+          </g>
+          <text x="50%" y="50%" dominantBaseline="central" fill="#EBEBEB" textAnchor="middle" className="text-6xl">{formatTime(time)}</text>
+        </svg>
+
+        <div className="flex justify-center gap-8">
+          <button onClick={() => handleSetTime(60)}>
+            <div className="flex justify-center bg-[#313131] p-2 rounded-[20px] w-24 gap-1 text-[#EBEBEB] cursor-pointer hover:opacity-75">5 min</div>
+          </button>
+          <button onClick={() => handleSetTime(600)}>
+            <div className="flex justify-center bg-[#313131] p-2 rounded-[20px] w-24 gap-2 text-[#EBEBEB] cursor-pointer hover:opacity-75">10 min</div>
+          </button>
+          <button onClick={() => handleSetTime(900)}>
+          <div className="flex justify-center bg-[#313131] p-2 rounded-[20px] w-24 gap-3 text-[#EBEBEB] cursor-pointer hover:opacity-75">15 min</div>
+          </button>
+          <button onClick={() => handleSetTime(1200)}>
+          <div className="flex justify-center bg-[#313131] p-2 rounded-[20px] w-24 gap-4 text-[#EBEBEB] cursor-pointer hover:opacity-75">20 min</div>
+          </button>
+        </div>
+       
+        <div className="flex  justify-between rounded-[40px] bg-[#313131] mt-8 w-60">
+            <button onClick={() => handleSetTime(initialTime)} className="p-4 flex justify-center flex-1 text-[#EBEBEB] border-r border-[#3E3838] cursor-pointer hover:opacity-70">
+              <RotateCcw />
+            </button>
+            <button onClick={() => setStartTime(!startTime)} className="p-4 flex justify-center flex-1 text-[#EBEBEB] border-r border-[#3E3838] cursor-pointer hover:opacity-70">
+              {startTime ? <Pause /> : <Play />}
+            </button>
+            <button onClick={() => setAlarm(!alarm)} className="p-4 flex justify-center flex-1 text-[#EBEBEB] cursor-pointer hover:opacity-70">
+              {!alarm ? <BellOff /> : <BellRing />} 
+            </button>
+        </div>
+      </div>
+      {<audio ref={audioPlayer} src={NotificationSound}  autoPlay/>}
+    </main>
+  );
+}

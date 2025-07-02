@@ -136,7 +136,7 @@ export default function Home() {
         <div className="flex justify-center gap-8">
           <TimeButton
             label="5 min"
-            seconds={60}
+            seconds={300}
             activeTime={activeTime}
             onClick={handleSetTime}
           />

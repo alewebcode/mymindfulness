@@ -10,10 +10,12 @@ import {
 import { useEffect, useRef, useState } from "react";
 import NotificationSound from "../../public/notifications/notification-sound.mp3";
 import ConfettiExplosion from "confetti-explosion-react";
+import { TimeButton } from "@/components/TimeButton";
 
 export default function Home() {
+  const CIRCLE_LENGTH = 942;
+
   const [progress, setProgress] = useState(0);
-  const [count, setCount] = useState(1);
   const [time, setTime] = useState(0);
   const [activeTime, setActiveTime] = useState(0);
   const [initialTime, setinitialTime] = useState(0);
@@ -22,8 +24,10 @@ export default function Home() {
   const audioPlayer = useRef<HTMLAudioElement>(null);
   const [isExploding, setIsExploding] = useState(false);
 
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
-    if (progress === 942 && time === 0) {
+    if (progress === CIRCLE_LENGTH && time === 0) {
       setIsExploding(true);
       setTimeout(() => {
         setIsExploding(false);
@@ -31,47 +35,41 @@ export default function Home() {
         setActiveTime(0);
       }, 3000);
     }
-    if (progress === 942 && alarm && time === 0) {
-      if (audioPlayer.current) audioPlayer.current.play();
-      setProgress(0);
-      setActiveTime(0);
+  }, [progress, time]);
+
+  useEffect(() => {
+    if (
+      progress === CIRCLE_LENGTH &&
+      alarm &&
+      time === 0 &&
+      audioPlayer.current
+    ) {
+      audioPlayer.current.play();
     }
+  }, [progress, time, alarm]);
 
-    if (time > 0 && startTime) {
-      const num = 942 / initialTime;
+  useEffect(() => {
+    if (time > 0 && startTime && progress <= CIRCLE_LENGTH) {
+      const num = CIRCLE_LENGTH / initialTime;
 
-      if (progress <= 942) {
-        let IdInterval = setInterval(() => {
-          setCount((count) => count + 1);
-          setTime((time) => time - 1000);
-        }, 1000);
-
-        setProgress(num * count);
-
-        return () => {
-          clearInterval(IdInterval);
-        };
-      }
+      intervalRef.current = setInterval(() => {
+        setTime((prev) => prev - 1000);
+        setProgress((prev) => parseFloat((prev + num).toFixed(2)));
+      }, 1000);
     }
-  }, [count, time, startTime, progress]);
+    return () => clearInterval(intervalRef.current!);
+  }, [time, startTime, progress, initialTime]);
 
   const formatTime = (t: number) => {
-    let formatSecond = t / 1000;
+    const totalSeconds = Math.floor(t / 1000);
+    const min = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
+    const sec = String(totalSeconds % 60).padStart(2, "0");
 
-    //let diff = formatSecond - (((Date.now() - Date.now()) / 1000) | 0);
-    console.log(formatSecond);
-    let min = Math.floor(formatSecond / 60);
-    let seconds = Math.floor(formatSecond % 60);
-
-    let formatMinutes = min < 10 ? "0" + min : min;
-    let formatSeconds = seconds < 10 ? "0" + seconds : seconds;
-
-    return `${formatMinutes}:${formatSeconds}`;
+    return `${min}:${sec}`;
   };
 
   const handleSetTime = (t: number) => {
     const time = t * 1000;
-    setCount(1);
     setTime(time);
     setActiveTime(t);
     setinitialTime(t);
@@ -92,7 +90,7 @@ export default function Home() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24 w-100">
+    <main className="flex min-h-screen flex-col items-center justify-between p-24 w-full">
       {isExploding && (
         <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none overflow-hidden">
           <ConfettiExplosion />
@@ -109,7 +107,7 @@ export default function Home() {
               fill="#292929"
               stroke="#3A3737"
               strokeWidth="10"
-              strokeDasharray="942"
+              strokeDasharray={CIRCLE_LENGTH}
               strokeDashoffset="0"
             ></circle>
             <circle
@@ -120,7 +118,7 @@ export default function Home() {
               fill="transparent"
               stroke="#46EE6A"
               strokeWidth="10"
-              strokeDasharray="942"
+              strokeDasharray={CIRCLE_LENGTH}
               strokeDashoffset={progress}
             ></circle>
           </g>
@@ -136,58 +134,33 @@ export default function Home() {
           </text>
         </svg>
         <div className="flex justify-center gap-8">
-          <button
-            onClick={() => handleSetTime(300)}
-            className={`flex justify-center bg-[#313131] p-2 rounded-[20px] w-24 gap-1 cursor-pointer hover:opacity-75
-                     active:bg-[#46EE6A] ${
-                       activeTime > 0 && activeTime === 300
-                         ? "bg-[#46EE6A] text-[#000]"
-                         : "text-[#EBEBEB]"
-                     }`}
-          >
-            5 min
-          </button>
-          <button onClick={() => handleSetTime(600)}>
-            <div
-              className={`flex justify-center bg-[#313131] p-2 rounded-[20px] w-24 gap-1 cursor-pointer hover:opacity-75
-                     active:bg-[#46EE6A] ${
-                       activeTime > 0 && activeTime === 600
-                         ? "bg-[#46EE6A] text-[#000]"
-                         : "text-[#EBEBEB]"
-                     }`}
-            >
-              10 min
-            </div>
-          </button>
-          <button onClick={() => handleSetTime(900)}>
-            <div
-              className={`flex justify-center bg-[#313131] p-2 rounded-[20px] w-24 gap-1 cursor-pointer hover:opacity-75
-                     active:bg-[#46EE6A] ${
-                       activeTime > 0 && activeTime === 900
-                         ? "bg-[#46EE6A] text-[#000]"
-                         : "text-[#EBEBEB]"
-                     }`}
-            >
-              15 min
-            </div>
-          </button>
-          <button onClick={() => handleSetTime(1200)}>
-            <div
-              className={`flex justify-center bg-[#313131] p-2 rounded-[20px] w-24 gap-1 cursor-pointer hover:opacity-75
-                     active:bg-[#46EE6A] ${
-                       activeTime > 0 && activeTime === 1200
-                         ? "bg-[#46EE6A] text-[#000]"
-                         : "text-[#EBEBEB]"
-                     }`}
-            >
-              20 min
-            </div>
-          </button>
+          <TimeButton
+            label="5 min"
+            seconds={60}
+            activeTime={activeTime}
+            onClick={handleSetTime}
+          />
+          <TimeButton
+            label="10 min"
+            seconds={600}
+            activeTime={activeTime}
+            onClick={handleSetTime}
+          />
+          <TimeButton
+            label="15 min"
+            seconds={900}
+            activeTime={activeTime}
+            onClick={handleSetTime}
+          />
+          <TimeButton
+            label="20 min"
+            seconds={1200}
+            activeTime={activeTime}
+            onClick={handleSetTime}
+          />
         </div>
         <div className="flex items-center mt-8">
-          {" "}
           <div className="flex justify-between rounded-[40px] bg-[#313131] w-60">
-            {" "}
             <button
               onClick={() => handleSetTime(initialTime)}
               className="p-4 flex justify-center flex-1 text-[#EBEBEB] border-r border-[#3E3838] cursor-pointer hover:opacity-70"

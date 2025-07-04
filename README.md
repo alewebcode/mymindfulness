@@ -8,7 +8,7 @@ Ele oferece um temporizador personalizado, no qual é possível escolher a dura�
 
 
 ## ✨ Tecnologias e Recursos utilizados
-NextJs
+NextJs <br/>
 Tailwind Css
 Lucide react
 Confetti explosion react

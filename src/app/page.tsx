@@ -90,7 +90,7 @@ export default function Home() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24 w-full">
+    <main className="flex min-h-screen flex-col items-center justify-center p-8 w-full overflow-hidden">
       {isExploding && (
         <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none overflow-hidden">
           <ConfettiExplosion />

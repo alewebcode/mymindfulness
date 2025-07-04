@@ -1,5 +1,5 @@
 
-<h3 align="center">App Mindfulness</h3>
+<h3 align="center">My Mindfulness</h3>
 
 ## :rocket: Sobre o App
 

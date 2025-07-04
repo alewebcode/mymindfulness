@@ -1,6 +1,9 @@
 
 <h3 align="center">My Mindfulness</h3>
 
+![image](https://github.com/user-attachments/assets/664d1c0f-c98e-4683-b4bd-2fb772f38866)
+
+
 ## :rocket: Sobre o App
 
 O Mindfulness é um projeto desenvolvido para facilitar a prática da atenção plena.

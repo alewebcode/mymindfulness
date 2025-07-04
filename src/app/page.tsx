@@ -97,6 +97,9 @@ export default function Home() {
         </div>
       )}
       <div className="flex justify-center flex-col items-center">
+        <div className="flex justify-center w-100 text-[#FFF] text-2xl">
+          My Mindfulness
+        </div>
         <svg className="h-96 w-96">
           <g transform="rotate(-90 100 100)">
             <circle
